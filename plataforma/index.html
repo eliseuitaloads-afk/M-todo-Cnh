@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B101C">
+<title>Método CNH — Área de Estudos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --amber:#F5A623; --amber-2:#FFC240; --yellow:#FFC93C; --amber-dark:#C87F0A;
+  --green:#10B981; --green-2:#34D399;
+  --ink:#F5F7FA;
+  --g600:#C6CDD9; --g500:#98A2B3; --g400:#7A8598;
+  --line:#243350;
+  --bg:#0B101C; --bg2:#0D1526; --card:#141E33;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Outfit',sans-serif;line-height:1.25}
+button{font-family:inherit;cursor:pointer;border:none}
+a{color:var(--yellow)}
+
+/* ============ LOGIN ============ */
+#login{min-height:100vh;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(800px 400px at 50% 0%,rgba(245,166,35,.12),transparent 60%),var(--bg)}
+.login-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:38px 32px;text-align:center}
+.logo{font-family:'Outfit';font-weight:800;font-size:22px;margin-bottom:6px}
+.logo b{color:var(--yellow)}
+.login-box .sub{color:var(--g500);font-size:14px;margin-bottom:26px}
+.field{text-align:left;margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--g600);margin-bottom:6px}
+.field input{width:100%;background:#0F1729;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;color:#fff;font-size:15px;transition:.15s}
+.field input:focus{outline:none;border-color:var(--amber)}
+.btn{background:linear-gradient(180deg,var(--amber-2),var(--amber));color:#161616;font-family:'Outfit';font-weight:800;border-radius:12px;padding:15px 22px;font-size:15px;width:100%;transition:.2s;box-shadow:0 8px 22px rgba(245,166,35,.28)}
+.btn:hover{filter:brightness(1.06)}
+.btn:disabled{opacity:.6;cursor:wait}
+.linkbtn{background:none;color:var(--g500);font-size:13.5px;text-decoration:underline;margin-top:16px;width:100%;padding:4px}
+.msg{font-size:13.5px;border-radius:10px;padding:11px 14px;margin-bottom:16px;display:none;text-align:left}
+.msg.err{display:block;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);color:#FCA5A5}
+.msg.ok{display:block;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:#6EE7B7}
+.login-foot{margin-top:22px;font-size:12.5px;color:var(--g400)}
+
+/* ============ APP ============ */
+#app{display:none}
+header{position:sticky;top:0;z-index:50;background:rgba(5,8,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px}
+header .who{font-size:13px;color:var(--g500)}
+header .who b{color:#fff;display:block;font-family:'Outfit';font-size:14px}
+.out{background:none;border:1px solid var(--line);color:var(--g500);border-radius:10px;padding:9px 16px;font-size:13px;font-weight:700}
+.out:hover{border-color:var(--amber);color:var(--yellow)}
+
+.tabs{display:flex;gap:8px;padding:16px 22px 0;max-width:1240px;margin:0 auto}
+.tab{background:var(--card);border:1px solid var(--line);color:var(--g500);border-radius:12px 12px 0 0;padding:12px 22px;font-family:'Outfit';font-weight:700;font-size:14.5px;border-bottom:none}
+.tab.on{background:var(--bg2);color:var(--yellow);border-color:rgba(245,166,35,.5)}
+
+.shell{max-width:1240px;margin:0 auto;padding:0 22px 60px}
+.pane{display:none}
+.pane.on{display:block}
+
+/* progresso geral */
+.hero-prog{background:var(--bg2);border:1px solid var(--line);border-radius:0 16px 16px 16px;padding:24px 26px;margin-bottom:24px}
+.hero-prog h2{font-size:20px;margin-bottom:4px}
+.hero-prog p{color:var(--g500);font-size:14px;margin-bottom:16px}
+.bar{height:12px;border-radius:99px;background:#0F1729;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--green));border-radius:99px;transition:width .5s}
+.prog-meta{display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--g500);font-weight:600}
+.prog-meta b{color:var(--yellow)}
+
+/* layout aulas */
+.grid{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+.player{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;position:sticky;top:78px}
+.frame{aspect-ratio:16/9;background:#05080F;display:grid;place-items:center}
+.frame iframe{width:100%;height:100%;border:0}
+.frame .empty{text-align:center;color:var(--g400);font-size:14px;padding:20px}
+.frame .empty .play{width:60px;height:60px;border-radius:50%;background:rgba(245,166,35,.14);border:1px solid rgba(245,166,35,.4);color:var(--yellow);display:grid;place-items:center;font-size:22px;margin:0 auto 12px;padding-left:4px}
+.pinfo{padding:22px 24px}
+.pinfo .tag{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow)}
+.pinfo h3{font-size:21px;margin:6px 0 16px}
+.done-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:transparent;border:1.5px solid var(--green-2);color:var(--green-2);border-radius:12px;padding:14px;font-family:'Outfit';font-weight:800;font-size:15px;transition:.18s}
+.done-btn:hover{background:rgba(52,211,153,.10)}
+.done-btn.is-done{background:var(--green);border-color:var(--green);color:#06251C}
+
+/* trilha */
+.trilha{display:flex;flex-direction:column;gap:12px}
+.mod{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.mod.bonus{border-color:rgba(52,211,153,.4)}
+.mod.bonus .mod-num{color:rgba(52,211,153,.6)}
+.mod.bonus .mod-count{color:var(--green-2);background:rgba(52,211,153,.10);border-color:rgba(52,211,153,.35)}
+.mod.bonus .mod-chev{color:var(--green-2)}
+.mod-head{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer}
+.mod-head:hover{background:rgba(255,255,255,.02)}
+.mod-num{font-family:'Outfit';font-weight:800;font-size:17px;color:rgba(245,166,35,.5);min-width:26px}
+.mod-name{flex:1;font-family:'Outfit';font-weight:700;font-size:15px}
+.mod-count{font-size:11.5px;font-weight:800;color:var(--yellow);background:rgba(245,166,35,.10);border:1px solid rgba(245,166,35,.35);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.mod-chev{color:var(--yellow);font-size:12px;transition:.25s}
+.mod.open .mod-chev{transform:rotate(180deg)}
+.mod-body{display:none;border-top:1px solid var(--line);padding:6px}
+.mod.open .mod-body{display:block}
+.aula{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--g600);transition:.15s}
+.aula:hover{background:rgba(255,255,255,.03)}
+.aula.sel{background:rgba(245,166,35,.10);color:#fff}
+.aula .tick{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:10px;flex-shrink:0;color:transparent}
+.aula.done .tick{background:var(--green);border-color:var(--green);color:#06251C}
+.aula.done{color:var(--g400)}
+
+/* downloads */
+.dls{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:24px}
+.dl{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;transition:.2s}
+.dl:hover{border-color:rgba(245,166,35,.5);transform:translateY(-2px)}
+.dl .ico{width:52px;height:52px;border-radius:12px;background:rgba(245,166,35,.10);border:1px solid rgba(245,166,35,.35);display:grid;place-items:center;font-size:24px;flex-shrink:0}
+.dl h4{font-size:16px;margin-bottom:2px}
+.dl p{font-size:13px;color:var(--g500)}
+.dl .go{margin-left:auto;background:linear-gradient(180deg,var(--amber-2),var(--amber));color:#161616;font-family:'Outfit';font-weight:800;font-size:13px;border-radius:10px;padding:10px 16px;text-decoration:none;white-space:nowrap}
+
+.pane-title{font-size:22px;margin:26px 0 4px}
+.pane-sub{color:var(--g500);font-size:14.5px}
+
+@media(max-width:960px){
+  .grid{grid-template-columns:1fr}
+  .player{position:static}
+  .dls{grid-template-columns:1fr}
+  .tabs{padding:14px 16px 0}
+  .shell{padding:0 16px 80px}
+  .tab{padding:11px 16px;font-size:13.5px}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login">
+  <div class="login-box">
+    <div class="logo">Método <b>CNH</b></div>
+    <p class="sub">Entre com o e-mail e a senha que você recebeu após a compra.</p>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="field">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label for="pass">Senha</label>
+      <input type="password" id="pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn" id="btnLogin">ENTRAR NA ÁREA DE ESTUDOS</button>
+    <button class="linkbtn" id="btnReset">Esqueci minha senha</button>
+
+    <p class="login-foot">Comprou e não recebeu o acesso? Fale com o suporte.</p>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app">
+  <header>
+    <div class="logo">Método <b>CNH</b></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="who">Olá,<b id="nomeAluno">aluno</b></div>
+      <button class="out" id="btnOut">Sair</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-pane="aulas">🎬 Aulas</button>
+    <button class="tab" data-pane="downloads">📥 Materiais</button>
+  </div>
+
+  <div class="shell">
+    <!-- ---------- AULAS ---------- -->
+    <div class="pane on" id="pane-aulas">
+      <div class="hero-prog">
+        <h2>Sua trilha até a aprovação 🎯</h2>
+        <p>Siga as matérias na ordem. Marque cada aula como concluída pra acompanhar seu avanço.</p>
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="prog-meta">
+          <span><b id="pctTxt">0%</b> concluído</span>
+          <span><b id="doneTxt">0</b> de <span id="totalTxt">0</span> aulas</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="player">
+          <div class="frame" id="frame">
+            <div class="empty">
+              <div class="play">▶</div>
+              Escolha uma aula na trilha ao lado pra começar.
+            </div>
+          </div>
+          <div class="pinfo">
+            <div class="tag" id="pTag">Comece por aqui</div>
+            <h3 id="pTitle">Selecione uma aula</h3>
+            <button class="done-btn" id="btnDone" style="display:none">
+              <span id="doneIco">○</span> <span id="doneTxt2">Marcar como concluída</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="trilha" id="trilha"></div>
+      </div>
+    </div>
+
+    <!-- ---------- DOWNLOADS ---------- -->
+    <div class="pane" id="pane-downloads">
+      <h2 class="pane-title">Seus materiais 📥</h2>
+      <p class="pane-sub">Baixe, imprima e revise quantas vezes quiser.</p>
+      <div class="dls" id="dls"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+/* =====================================================================
+   1) CONFIGURAÇÃO — cole aqui os dados do seu projeto Supabase
+      (Settings > API > Project URL e anon public key)
+   ===================================================================== */
+const SUPABASE_URL  = 'https://mfsmobustnbdjffsvxne.supabase.co';
+const SUPABASE_ANON = 'sb_publishable__cRuqTRZ3mn99-VolDIqoQ_JgHYJcHv';
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* =====================================================================
+   2) CONTEÚDO DAS AULAS
+      - yt: é só o ID do vídeo do YouTube (o que vem depois de "v=")
+        Ex: https://youtube.com/watch?v=ABC123xyz  ->  yt: 'ABC123xyz'
+      - id: identificador único da aula (não repita, não mude depois)
+      Adicione quantas aulas quiser dentro de cada módulo.
+   ===================================================================== */
+const MODULOS = [
+  /* ======== PROVA TEÓRICA ======== */
+  { n:'01', nome:'Legislação de Trânsito', aulas:[
+    { id:'teo-leg-01', t:'Legislação de Trânsito — questões da CNH do Brasil', yt:'5sy1uvPHOLU' },
+    { id:'teo-leg-02', t:'Legislação: as questões que mais caem (parte 1)', yt:'UdQxw6sHqZI' },
+    { id:'teo-leg-03', t:'Legislação: as questões que mais caem (parte 2)', yt:'BuCwfXQyHHw' },
+    { id:'teo-leg-04', t:'Legislação: as questões que mais caem (parte 3)', yt:'p_Juh_eTvjE' },
+    { id:'teo-leg-05', t:'Legislação: as questões que mais caem (parte 4)', yt:'hHSXatmPbzY' },
+    { id:'teo-leg-06', t:'Legislação: as questões que mais caem (parte 5)', yt:'zTV7kQIrDMM' },
+    { id:'teo-leg-07', t:'Legislação: as questões que mais caem (parte 6)', yt:'KPmLrQoiW4k' },
+    { id:'teo-leg-08', t:'Legislação: as questões que mais caem (parte 7)', yt:'fF4efF4wJhc' },
+    { id:'teo-leg-09', t:'Legislação mais cobrada na prova 2026', yt:'HccoriVTRrU' },
+    { id:'teo-leg-10', t:'Cadeirinhas de criança — CTB e resoluções do Contran', yt:'pPf4B0oEfCw' },
+  ]},
+  { n:'02', nome:'Sinalização e Placas', aulas:[
+    { id:'teo-sin-01', t:'Como decorar as placas de trânsito', yt:'qYmOm93NfWE' },
+    { id:'teo-sin-02', t:'Todas as placas de regulamentação explicadas', yt:'F1TQszrkuV8' },
+    { id:'teo-sin-03', t:'Como decorar as placas de advertência', yt:'LwSoDvL62YI' },
+    { id:'teo-sin-04', t:'50 questões de placas (técnica de memorização)', yt:'5s0nbAQ3PB8' },
+    { id:'teo-sin-05', t:'100 questões de placas (técnica de memorização)', yt:'ywZTFg6QT5E' },
+  ]},
+  { n:'03', nome:'Direção Defensiva', aulas:[
+    { id:'teo-dir-01', t:'20 questões de Direção Defensiva (técnica de memorização)', yt:'5n-x6RX0Rp4' },
+    { id:'teo-dir-02', t:'Simulado de Direção Defensiva 2026 — questões reais', yt:'ERRmlm7S-fM' },
+    { id:'teo-dir-03', t:'Questões bem cobradas nas provas de todo o Brasil', yt:'oyDDUyj11jo' },
+  ]},
+  { n:'04', nome:'Simulados e Questões Comentadas', aulas:[
+    { id:'teo-sim-01', t:'Simulado: 15 questões reais da CNH do Brasil', yt:'wD1nQQerCCo' },
+    { id:'teo-sim-02', t:'Simulado: 30 questões reais da CNH do Brasil', yt:'QlmROd52-ZQ' },
+    { id:'teo-sim-03', t:'Simulado: 15 questões comentadas e atualizadas', yt:'XWQ4bglpaJs' },
+    { id:'teo-sim-04', t:'Simulado: 30 questões que mais caem', yt:'qebu_jUbaj4' },
+    { id:'teo-sim-05', t:'As 15 questões que mais caem na prova', yt:'RiKy1c2VykY' },
+    { id:'teo-sim-06', t:'Simulado real: 30 questões resolvidas', yt:'qOyn9ihyFTk' },
+    { id:'teo-sim-07', t:'Simulado real: teste se você está pronto (30 questões)', yt:'fxsQ2Qepawo' },
+    { id:'teo-sim-08', t:'Prova oficial: questões comentadas (parte 1)', yt:'pxtPRExpjS8' },
+    { id:'teo-sim-09', t:'Prova oficial: questões comentadas (parte 2)', yt:'25fEoM5I_wg' },
+    { id:'teo-sim-10', t:'Prova oficial: questões comentadas (parte 3)', yt:'ISgeYTMK8O4' },
+    { id:'teo-sim-11', t:'Resolução de questões — não estude sozinho', yt:'He7o11xVWH8' },
+    { id:'teo-sim-12', t:'Questões bem cobradas nas provas de todo o Brasil (parte 1)', yt:'COKSQ6q-QAs' },
+    { id:'teo-sim-13', t:'Questões bem cobradas nas provas de todo o Brasil (parte 2)', yt:'O9Ye2Dprtnc' },
+    { id:'teo-sim-14', t:'Questões atualizadas do Detran 2026', yt:'JiyGPOdhAzc' },
+    { id:'teo-sim-15', t:'Prova teórica: questões comentadas do exame escrito', yt:'wDgFvrPiED8' },
+  ]},
+  { n:'05', nome:'Mecânica Básica', aulas:[
+    { id:'teo-mec-01', t:'Mecânica Básica: as questões que mais reprovam', yt:'wG1Ozpr8RNg' },
+  ]},
+  { n:'06', nome:'Primeiros Socorros', aulas:[
+    { id:'teo-soc-01', t:'Primeiros Socorros: questões mais cobradas na prova', yt:'OHO3JB9RMGc' },
+  ]},
+
+  /* ======== BÔNUS: PSICOTÉCNICO (164 aulas — já preenchidas) ======== */
+  { n:'B1', nome:'Bônus · Psicotécnico — Treinos 1 a 20', aulas:[
+    { id:'psi-001', t:'Treino 1 — Exercício de psicotécnico', yt:'Cvpset1b0pY' },
+    { id:'psi-002', t:'Treino 2 — Exercício de psicotécnico', yt:'4PQ0I2Vy0zc' },
+    { id:'psi-003', t:'Treino 3 — Exercício de psicotécnico', yt:'j437xGeCj9U' },
+    { id:'psi-004', t:'Treino 4 — Exercício de psicotécnico', yt:'BWGv6XnVuHM' },
+    { id:'psi-005', t:'Treino 5 — Exercício de psicotécnico', yt:'V27RR70Q-ZA' },
+    { id:'psi-006', t:'Treino 6 — Exercício de psicotécnico', yt:'osImU4x6q4o' },
+    { id:'psi-007', t:'Treino 7 — Exercício de psicotécnico', yt:'RCFoblX2obY' },
+    { id:'psi-008', t:'Treino 8 — Exercício de psicotécnico', yt:'lHJ_Ow_BcFg' },
+    { id:'psi-009', t:'Treino 9 — Exercício de psicotécnico', yt:'zmpf8VKFmck' },
+    { id:'psi-010', t:'Treino 10 — Exercício de psicotécnico', yt:'WiIqbpmvuQk' },
+    { id:'psi-011', t:'Treino 11 — Exercício de psicotécnico', yt:'vtg1nSgiEwk' },
+    { id:'psi-012', t:'Treino 12 — Exercício de psicotécnico', yt:'yUIL8u9qafc' },
+    { id:'psi-013', t:'Treino 13 — Exercício de psicotécnico', yt:'Y9fdnJsloEk' },
+    { id:'psi-014', t:'Treino 14 — Exercício de psicotécnico', yt:'sGu637D6Pfk' },
+    { id:'psi-015', t:'Treino 15 — Exercício de psicotécnico', yt:'sXqP41rmS2I' },
+    { id:'psi-016', t:'Treino 16 — Exercício de psicotécnico', yt:'IJgzsov-5Vc' },
+    { id:'psi-017', t:'Treino 17 — Exercício de psicotécnico', yt:'jpDHSsvKTF0' },
+    { id:'psi-018', t:'Treino 18 — Exercício de psicotécnico', yt:'-akJpbxzmH8' },
+    { id:'psi-019', t:'Treino 19 — Exercício de psicotécnico', yt:'VBFXThsINDI' },
+    { id:'psi-020', t:'Treino 20 — Exercício de psicotécnico', yt:'bxYUEipaup8' },
+  ]},
+  { n:'B2', nome:'Bônus · Psicotécnico — Treinos 21 a 40', aulas:[
+    { id:'psi-021', t:'Treino 21 — Exercício de psicotécnico', yt:'D8oaKHg9kMw' },
+    { id:'psi-022', t:'Treino 22 — Exercício de psicotécnico', yt:'nmx7Xz1mraE' },
+    { id:'psi-023', t:'Treino 23 — Exercício de psicotécnico', yt:'Fh0XYNLG4CI' },
+    { id:'psi-024', t:'Treino 24 — Exercício de psicotécnico', yt:'FfiQrrFoAvI' },
+    { id:'psi-025', t:'Treino 25 — Exercício de psicotécnico', yt:'WidWPGBf6ik' },
+    { id:'psi-026', t:'Treino 26 — Exercício de psicotécnico', yt:'BiUh4BFGWSg' },
+    { id:'psi-027', t:'Treino 27 — Exercício de psicotécnico', yt:'qJ7zyPVsxSA' },
+    { id:'psi-028', t:'Treino 28 — Exercício de psicotécnico', yt:'2dr0VoRN8A8' },
+    { id:'psi-029', t:'Treino 29 — Exercício de psicotécnico', yt:'LEaK1LzlSx0' },
+    { id:'psi-030', t:'Treino 30 — Exercício de psicotécnico', yt:'fMNmIq5__uU' },
+    { id:'psi-031', t:'Treino 31 — Exercício de psicotécnico', yt:'-hf4wFyfZPE' },
+    { id:'psi-032', t:'Treino 32 — Exercício de psicotécnico', yt:'dn8ph99iwiM' },
+    { id:'psi-033', t:'Treino 33 — Exercício de psicotécnico', yt:'G9oziiDxW2Y' },
+    { id:'psi-034', t:'Treino 34 — Exercício de psicotécnico', yt:'_qxQNo9uVcU' },
+    { id:'psi-035', t:'Treino 35 — Exercício de psicotécnico', yt:'1Kx1Txav0YQ' },
+    { id:'psi-036', t:'Treino 36 — Exercício de psicotécnico', yt:'5YmaIamOmNQ' },
+    { id:'psi-037', t:'Treino 37 — Exercício de psicotécnico', yt:'tC8AFpv4S4s' },
+    { id:'psi-038', t:'Treino 38 — Exercício de psicotécnico', yt:'5y88tzVmvEs' },
+    { id:'psi-039', t:'Treino 39 — Exercício de psicotécnico', yt:'IvdvMl0DlV4' },
+    { id:'psi-040', t:'Treino 40 — Exercício de psicotécnico', yt:'fqRKfxmHMwY' },
+  ]},
+  { n:'B3', nome:'Bônus · Psicotécnico — Treinos 41 a 60', aulas:[
+    { id:'psi-041', t:'Treino 41 — Exercício de psicotécnico', yt:'Dg_ad1WLC-c' },
+    { id:'psi-042', t:'Treino 42 — Exercício de psicotécnico', yt:'vsanN2uJsxI' },
+    { id:'psi-043', t:'Treino 43 — Exercício de psicotécnico', yt:'ZI6W7JVAtrQ' },
+    { id:'psi-044', t:'Treino 44 — Exercício de psicotécnico', yt:'aHauAy4ZrJ4' },
+    { id:'psi-045', t:'Treino 45 — Exercício de psicotécnico', yt:'r3TZ-T_6FGY' },
+    { id:'psi-046', t:'Treino 46 — Exercício de psicotécnico', yt:'Wyfd8uA_-QU' },
+    { id:'psi-047', t:'Treino 47 — Exercício de psicotécnico', yt:'Zz0ThHtu170' },
+    { id:'psi-048', t:'Treino 48 — Exercício de psicotécnico', yt:'mheO1SZicIw' },
+    { id:'psi-049', t:'Treino 49 — Exercício de psicotécnico', yt:'6weTaCyJ3Qo' },
+    { id:'psi-050', t:'Treino 50 — Exercício de psicotécnico', yt:'n-GS_kCc_QQ' },
+    { id:'psi-051', t:'Treino 51 — Exercício de psicotécnico', yt:'efPIhYfe-zU' },
+    { id:'psi-052', t:'Treino 52 — Exercício de psicotécnico', yt:'6ng43cVuXSE' },
+    { id:'psi-053', t:'Treino 53 — Exercício de psicotécnico', yt:'gZLFW3qdaX0' },
+    { id:'psi-054', t:'Treino 54 — Exercício de psicotécnico', yt:'ukNEiZCkxgQ' },
+    { id:'psi-055', t:'Treino 55 — Exercício de psicotécnico', yt:'z7JgTT3L2gA' },
+    { id:'psi-056', t:'Treino 56 — Exercício de psicotécnico', yt:'635ZZ3EeN2w' },
+    { id:'psi-057', t:'Treino 57 — Exercício de psicotécnico', yt:'0jalf5D4Ky8' },
+    { id:'psi-058', t:'Treino 58 — Exercício de psicotécnico', yt:'EpOXAVPihN0' },
+    { id:'psi-059', t:'Treino 59 — Exercício de psicotécnico', yt:'h_4YCXGkr4Q' },
+    { id:'psi-060', t:'Treino 60 — Exercício de psicotécnico', yt:'SErwjDrQivY' },
+  ]},
+  { n:'B4', nome:'Bônus · Psicotécnico — Treinos 61 a 80', aulas:[
+    { id:'psi-061', t:'Treino 61 — Exercício de psicotécnico', yt:'j5ZfAR8SP2A' },
+    { id:'psi-062', t:'Treino 62 — Exercício de psicotécnico', yt:'Wzo4fQpO63c' },
+    { id:'psi-063', t:'Treino 63 — Exercício de psicotécnico', yt:'QtKh-s3GOzk' },
+    { id:'psi-064', t:'Treino 64 — Exercício de psicotécnico', yt:'2YI7MLC9YZc' },
+    { id:'psi-065', t:'Treino 65 — Exercício de psicotécnico', yt:'A5mhCWEWwXA' },
+    { id:'psi-066', t:'Treino 66 — Exercício de psicotécnico', yt:'PG7pf66UQiY' },
+    { id:'psi-067', t:'Treino 67 — Exercício de psicotécnico', yt:'ZS6_p3rkRYs' },
+    { id:'psi-068', t:'Treino 68 — Exercício de psicotécnico', yt:'_hUirvjGHUE' },
+    { id:'psi-069', t:'Treino 69 — Exercício de psicotécnico', yt:'aXqBbAEuaCQ' },
+    { id:'psi-070', t:'Treino 70 — Exercício de psicotécnico', yt:'ArK6YaEh16c' },
+    { id:'psi-071', t:'Treino 71 — Exercício de psicotécnico', yt:'QovKa53d3qk' },
+    { id:'psi-072', t:'Treino 72 — Exercício de psicotécnico', yt:'Nf2snzVnf50' },
+    { id:'psi-073', t:'Treino 73 — Exercício de psicotécnico', yt:'cowhx5PVk30' },
+    { id:'psi-074', t:'Treino 74 — Exercício de psicotécnico', yt:'Cc2PAyDwEaY' },
+    { id:'psi-075', t:'Treino 75 — Exercício de psicotécnico', yt:'Sl4TcSfbw0U' },
+    { id:'psi-076', t:'Treino 76 — Exercício de psicotécnico', yt:'qhq-090putc' },
+    { id:'psi-077', t:'Treino 77 — Exercício de psicotécnico', yt:'T0nNEyBzp3w' },
+    { id:'psi-078', t:'Treino 78 — Exercício de psicotécnico', yt:'iJlRdjGRnHo' },
+    { id:'psi-079', t:'Treino 79 — Exercício de psicotécnico', yt:'V4ey98RSoHI' },
+    { id:'psi-080', t:'Treino 80 — Exercício de psicotécnico', yt:'EV_P4EOPcn0' },
+  ]},
+  { n:'B5', nome:'Bônus · Psicotécnico — Treinos 81 a 100', aulas:[
+    { id:'psi-081', t:'Treino 81 — Exercício de psicotécnico', yt:'b_X5z454HRA' },
+    { id:'psi-082', t:'Treino 82 — Exercício de psicotécnico', yt:'RowsQgETJNU' },
+    { id:'psi-083', t:'Treino 83 — Exercício de psicotécnico', yt:'0oWKRMM3vR4' },
+    { id:'psi-084', t:'Treino 84 — Exercício de psicotécnico', yt:'c04TkEAz2V8' },
+    { id:'psi-085', t:'Treino 85 — Exercício de psicotécnico', yt:'kVMz143vyBQ' },
+    { id:'psi-086', t:'Treino 86 — Exercício de psicotécnico', yt:'fUxdBrdFW6c' },
+    { id:'psi-087', t:'Treino 87 — Exercício de psicotécnico', yt:'D910FoEuUCc' },
+    { id:'psi-088', t:'Treino 88 — Exercício de psicotécnico', yt:'nrzbIBh0obw' },
+    { id:'psi-089', t:'Treino 89 — Exercício de psicotécnico', yt:'AyP6_0gf50Q' },
+    { id:'psi-090', t:'Treino 90 — Exercício de psicotécnico', yt:'2L-jrhYv5BM' },
+    { id:'psi-091', t:'Treino 91 — Exercício de psicotécnico', yt:'n5Mi6n-X2ys' },
+    { id:'psi-092', t:'Treino 92 — Exercício de psicotécnico', yt:'IYrY8eag2hQ' },
+    { id:'psi-093', t:'Treino 93 — Exercício de psicotécnico', yt:'ElXyYQH4MJE' },
+    { id:'psi-094', t:'Treino 94 — Exercício de psicotécnico', yt:'z45aAmJM8xg' },
+    { id:'psi-095', t:'Treino 95 — Exercício de psicotécnico', yt:'X638t86j6AY' },
+    { id:'psi-096', t:'Treino 96 — Exercício de psicotécnico', yt:'w0J1-HF1An8' },
+    { id:'psi-097', t:'Treino 97 — Exercício de psicotécnico', yt:'7qjkljUzwxQ' },
+    { id:'psi-098', t:'Treino 98 — Exercício de psicotécnico', yt:'6ZZuqFJBaUM' },
+    { id:'psi-099', t:'Treino 99 — Exercício de psicotécnico', yt:'DzPDoSNOqaw' },
+    { id:'psi-100', t:'Treino 100 — Exercício de psicotécnico', yt:'qjSypFk3Cuw' },
+  ]},
+  { n:'B6', nome:'Bônus · Psicotécnico — Treinos 101 a 120', aulas:[
+    { id:'psi-101', t:'Treino 101 — Exercício de psicotécnico', yt:'lzvwj-4cUKY' },
+    { id:'psi-102', t:'Treino 102 — Exercício de psicotécnico', yt:'ruwJiHH53JI' },
+    { id:'psi-103', t:'Treino 103 — Exercício de psicotécnico', yt:'Cx96hcy9_sc' },
+    { id:'psi-104', t:'Treino 104 — Exercício de psicotécnico', yt:'YNpCc3lfAa8' },
+    { id:'psi-105', t:'Treino 105 — Exercício de psicotécnico', yt:'SVTfUXLX6nM' },
+    { id:'psi-106', t:'Treino 106 — Exercício de psicotécnico', yt:'vXvp94f4iQU' },
+    { id:'psi-107', t:'Treino 107 — Exercício de psicotécnico', yt:'ZM5p-2EbJ_E' },
+    { id:'psi-108', t:'Treino 108 — Exercício de psicotécnico', yt:'h3eDpiBdaUQ' },
+    { id:'psi-109', t:'Treino 109 — Exercício de psicotécnico', yt:'L7CmanSGviE' },
+    { id:'psi-110', t:'Treino 110 — Exercício de psicotécnico', yt:'kjFIIoK8eHI' },
+    { id:'psi-111', t:'Treino 111 — Exercício de psicotécnico', yt:'h0xQ9g0-4Jc' },
+    { id:'psi-112', t:'Treino 112 — Exercício de psicotécnico', yt:'rXmUI16LbQ0' },
+    { id:'psi-113', t:'Treino 113 — Exercício de psicotécnico', yt:'oTjyyvUjnHo' },
+    { id:'psi-114', t:'Treino 114 — Exercício de psicotécnico', yt:'CjaQyHIIjRM' },
+    { id:'psi-115', t:'Treino 115 — Exercício de psicotécnico', yt:'ypjqGidZzbc' },
+    { id:'psi-116', t:'Treino 116 — Exercício de psicotécnico', yt:'yvdvAiFBP7Y' },
+    { id:'psi-117', t:'Treino 117 — Exercício de psicotécnico', yt:'hjJ0koqCclk' },
+    { id:'psi-118', t:'Treino 118 — Exercício de psicotécnico', yt:'bnH-096vX4c' },
+    { id:'psi-119', t:'Treino 119 — Exercício de psicotécnico', yt:'h8Ps2RnBfyI' },
+    { id:'psi-120', t:'Treino 120 — Exercício de psicotécnico', yt:'V0vLJrwLAl0' },
+  ]},
+  { n:'B7', nome:'Bônus · Psicotécnico — Treinos 121 a 140', aulas:[
+    { id:'psi-121', t:'Treino 121 — Exercício de psicotécnico', yt:'XUZFruvJ3d8' },
+    { id:'psi-122', t:'Treino 122 — Exercício de psicotécnico', yt:'WUnKajzC638' },
+    { id:'psi-123', t:'Treino 123 — Exercício de psicotécnico', yt:'tQasXIma6qo' },
+    { id:'psi-124', t:'Treino 124 — Exercício de psicotécnico', yt:'fsC43I8ix7M' },
+    { id:'psi-125', t:'Treino 125 — Exercício de psicotécnico', yt:'eiO3BAL90Nk' },
+    { id:'psi-126', t:'Treino 126 — Exercício de psicotécnico', yt:'_0gxqHnEA-c' },
+    { id:'psi-127', t:'Treino 127 — Exercício de psicotécnico', yt:'qndagrMrnSQ' },
+    { id:'psi-128', t:'Treino 128 — Exercício de psicotécnico', yt:'55ehkhgHORc' },
+    { id:'psi-129', t:'Treino 129 — Exercício de psicotécnico', yt:'omm15-lNg4E' },
+    { id:'psi-130', t:'Treino 130 — Exercício de psicotécnico', yt:'dPxQRjNDlPg' },
+    { id:'psi-131', t:'Treino 131 — Exercício de psicotécnico', yt:'iPG1MiGyXq4' },
+    { id:'psi-132', t:'Treino 132 — Exercício de psicotécnico', yt:'G672O-g2k7Y' },
+    { id:'psi-133', t:'Treino 133 — Exercício de psicotécnico', yt:'pNc2VQzXnBM' },
+    { id:'psi-134', t:'Treino 134 — Exercício de psicotécnico', yt:'JWTXpw_xpNU' },
+    { id:'psi-135', t:'Treino 135 — Exercício de psicotécnico', yt:'GmylPc-yZAI' },
+    { id:'psi-136', t:'Treino 136 — Exercício de psicotécnico', yt:'9rBDwKLYSs4' },
+    { id:'psi-137', t:'Treino 137 — Exercício de psicotécnico', yt:'MUq5co5Vri4' },
+    { id:'psi-138', t:'Treino 138 — Exercício de psicotécnico', yt:'_SdaiiggMh0' },
+    { id:'psi-139', t:'Treino 139 — Exercício de psicotécnico', yt:'9M7nDv6EXNM' },
+    { id:'psi-140', t:'Treino 140 — Exercício de psicotécnico', yt:'gF68p8yyXCs' },
+  ]},
+  { n:'B8', nome:'Bônus · Psicotécnico — Treinos 141 a 160', aulas:[
+    { id:'psi-141', t:'Treino 141 — Exercício de psicotécnico', yt:'6s0rd41pSAc' },
+    { id:'psi-142', t:'Treino 142 — Exercício de psicotécnico', yt:'jRgit9oj63o' },
+    { id:'psi-143', t:'Treino 143 — Exercício de psicotécnico', yt:'7zqGC8hXGrA' },
+    { id:'psi-144', t:'Treino 144 — Exercício de psicotécnico', yt:'V9TTRnb-RE4' },
+    { id:'psi-145', t:'Treino 145 — Exercício de psicotécnico', yt:'abW0KlK4B9o' },
+    { id:'psi-146', t:'Treino 146 — Exercício de psicotécnico', yt:'mCraSr-PSpU' },
+    { id:'psi-147', t:'Treino 147 — Exercício de psicotécnico', yt:'fcAAlzOcgo4' },
+    { id:'psi-148', t:'Treino 148 — Exercício de psicotécnico', yt:'-mPppkkulR4' },
+    { id:'psi-149', t:'Treino 149 — Exercício de psicotécnico', yt:'DRplEPPYg3w' },
+    { id:'psi-150', t:'Treino 150 — Exercício de psicotécnico', yt:'-BoGpPe9HNY' },
+    { id:'psi-151', t:'Treino 151 — Exercício de psicotécnico', yt:'ohSDv8iE3oA' },
+    { id:'psi-152', t:'Treino 152 — Exercício de psicotécnico', yt:'WyCS9Czlxow' },
+    { id:'psi-153', t:'Treino 153 — Exercício de psicotécnico', yt:'PV4PZsicaK4' },
+    { id:'psi-154', t:'Treino 154 — Exercício de psicotécnico', yt:'EUMHKrjWVEU' },
+    { id:'psi-155', t:'Treino 155 — Exercício de psicotécnico', yt:'W7O0aMtMIik' },
+    { id:'psi-156', t:'Treino 156 — Exercício de psicotécnico', yt:'yrjxNAFN_Sw' },
+    { id:'psi-157', t:'Treino 157 — Exercício de psicotécnico', yt:'M8XXCStwpU4' },
+    { id:'psi-158', t:'Treino 158 — Exercício de psicotécnico', yt:'5Y5TKTqVx6s' },
+    { id:'psi-159', t:'Treino 159 — Exercício de psicotécnico', yt:'Hh4pT3lgJTM' },
+    { id:'psi-160', t:'Treino 160 — Exercício de psicotécnico', yt:'63Mgl7yWTYk' },
+  ]},
+  { n:'B9', nome:'Bônus · Psicotécnico — Treinos 161 a 164', aulas:[
+    { id:'psi-161', t:'Treino 161 — Exercício de psicotécnico', yt:'kY7O8ErWoUs' },
+    { id:'psi-162', t:'Treino 162 — Exercício de psicotécnico', yt:'zUQ-Rluuh3g' },
+    { id:'psi-163', t:'Treino 163 — Exercício de psicotécnico', yt:'IDr1bAyLAVE' },
+    { id:'psi-164', t:'Treino 164 — Exercício de psicotécnico', yt:'erXG6FG27Rw' },
+  ]},
+];
+
+/* =====================================================================
+   3) MATERIAIS PARA DOWNLOAD — troque o "url" pelo link do seu PDF
+   ===================================================================== */
+const MATERIAIS = [
+  { ico:'⚠️', t:'25 Pegadinhas que Mais Reprovam', d:'As questões-armadilha, com gabarito comentado.', url:'#' },
+  { ico:'⚖️', t:'25 Questões de Legislação',        d:'As que mais aparecem na prova do Detran.',      url:'#' },
+  { ico:'🧠', t:'Mapas Mentais das Placas',          d:'Todas as placas em mapas visuais.',            url:'#' },
+  { ico:'✅', t:'Checklist Premium DETRAN 2026',     d:'Revisão + véspera + dia da prova.',            url:'#' },
+  { ico:'📝', t:'Simulados Completos',               d:'Provas no estilo do Detran, com gabarito.',    url:'#' },
+  { ico:'📄', t:'30 Perguntas Mais Cobradas',        d:'Resumo rápido pra revisar antes da prova.',    url:'#' },
+];
+
+/* ===================== estado ===================== */
+let user = null;
+let feitas = new Set();
+let atual = null;
+const todasAulas = MODULOS.flatMap(m => m.aulas);
+
+/* ===================== login ===================== */
+const $ = id => document.getElementById(id);
+const msg = (txt, tipo='err') => { const m=$('msg'); m.textContent=txt; m.className='msg '+tipo; };
+
+$('btnLogin').onclick = async () => {
+  const email = $('email').value.trim(), password = $('pass').value;
+  if(!email || !password) return msg('Preencha o e-mail e a senha.');
+  $('btnLogin').disabled = true; $('btnLogin').textContent = 'ENTRANDO...';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  $('btnLogin').disabled = false; $('btnLogin').textContent = 'ENTRAR NA ÁREA DE ESTUDOS';
+  if(error) return msg('E-mail ou senha incorretos. Confira os dados que você recebeu por e-mail.');
+  iniciar();
+};
+$('pass').addEventListener('keydown', e => { if(e.key==='Enter') $('btnLogin').click(); });
+
+$('btnReset').onclick = async () => {
+  const email = $('email').value.trim();
+  if(!email) return msg('Digite seu e-mail acima e clique de novo.');
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
+  if(error) return msg('Não consegui enviar o e-mail. Tente novamente.');
+  msg('Enviamos um link de redefinição para o seu e-mail. ✅', 'ok');
+};
+
+$('btnOut').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+/* ===================== iniciar ===================== */
+async function iniciar(){
+  const { data:{ user:u } } = await sb.auth.getUser();
+  if(!u) return;
+  user = u;
+
+  const { data:perfil } = await sb.from('perfis').select('nome').eq('user_id', u.id).single();
+  $('nomeAluno').textContent = (perfil?.nome || u.email.split('@')[0]);
+
+  const { data:prog } = await sb.from('progresso').select('aula_id').eq('user_id', u.id);
+  feitas = new Set((prog||[]).map(p => p.aula_id));
+
+  $('login').style.display = 'none';
+  $('app').style.display = 'block';
+
+  renderTrilha();
+  renderMateriais();
+  atualizarBarra();
+}
+
+/* ===================== trilha ===================== */
+function renderTrilha(){
+  const box = $('trilha');
+  box.innerHTML = '';
+  MODULOS.forEach((m, i) => {
+    const feitasMod = m.aulas.filter(a => feitas.has(a.id)).length;
+    const el = document.createElement('div');
+    el.className = 'mod' + (i===0 ? ' open' : '') + (m.n.startsWith('B') ? ' bonus' : '');
+    el.innerHTML = `
+      <div class="mod-head">
+        <span class="mod-num">${m.n}</span>
+        <span class="mod-name">${m.nome}</span>
+        <span class="mod-count">${feitasMod}/${m.aulas.length}</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        ${m.aulas.map(a => `
+          <div class="aula ${feitas.has(a.id)?'done':''} ${atual&&atual.id===a.id?'sel':''}" data-aula="${a.id}">
+            <span class="tick">✓</span><span>${a.t}</span>
+          </div>`).join('')}
+      </div>`;
+    el.querySelector('.mod-head').onclick = () => el.classList.toggle('open');
+    el.querySelectorAll('.aula').forEach(node => {
+      node.onclick = () => abrirAula(node.dataset.aula);
+    });
+    box.appendChild(el);
+  });
+}
+
+function abrirAula(id){
+  const mod = MODULOS.find(m => m.aulas.some(a => a.id===id));
+  atual = mod.aulas.find(a => a.id===id);
+
+  $('pTag').textContent = mod.nome;
+  $('pTitle').textContent = atual.t;
+
+  const frame = $('frame');
+  if(atual.yt){
+    frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${atual.yt}?rel=0&modestbranding=1"
+      title="${atual.t}" allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+      allowfullscreen></iframe>`;
+  } else {
+    frame.innerHTML = `<div class="empty"><div class="play">▶</div>
+      Vídeo ainda não vinculado.<br><small>(preencha o campo <b>yt</b> desta aula no código)</small></div>`;
+  }
+
+  $('btnDone').style.display = 'flex';
+  pintarBotao();
+  renderTrilha();
+  if(window.innerWidth <= 960) frame.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function pintarBotao(){
+  const ok = feitas.has(atual.id);
+  const b = $('btnDone');
+  b.classList.toggle('is-done', ok);
+  $('doneIco').textContent = ok ? '✓' : '○';
+  $('doneTxt2').textContent = ok ? 'Aula concluída' : 'Marcar como concluída';
+}
+
+$('btnDone').onclick = async () => {
+  if(!atual || !user) return;
+  const ok = feitas.has(atual.id);
+  if(ok){
+    feitas.delete(atual.id);
+    await sb.from('progresso').delete().eq('user_id', user.id).eq('aula_id', atual.id);
+  } else {
+    feitas.add(atual.id);
+    await sb.from('progresso').upsert(
+      { user_id:user.id, aula_id:atual.id, concluida:true, atualizado:new Date().toISOString() },
+      { onConflict:'user_id,aula_id' }
+    );
+  }
+  pintarBotao();
+  renderTrilha();
+  atualizarBarra();
+};
+
+function atualizarBarra(){
+  const total = todasAulas.length, feito = todasAulas.filter(a => feitas.has(a.id)).length;
+  const pct = total ? Math.round(feito/total*100) : 0;
+  $('barFill').style.width = pct + '%';
+  $('pctTxt').textContent  = pct + '%';
+  $('doneTxt').textContent = feito;
+  $('totalTxt').textContent= total;
+}
+
+/* ===================== materiais ===================== */
+function renderMateriais(){
+  $('dls').innerHTML = MATERIAIS.map(m => `
+    <div class="dl">
+      <span class="ico">${m.ico}</span>
+      <div><h4>${m.t}</h4><p>${m.d}</p></div>
+      <a class="go" href="${m.url}" target="_blank" rel="noopener">Baixar</a>
+    </div>`).join('');
+}
+
+/* ===================== abas ===================== */
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    $('pane-' + t.dataset.pane).classList.add('on');
+  };
+});
+
+/* ===================== sessão já ativa? ===================== */
+(async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session) iniciar();
+})();
+</script>
+</body>
+</html>
