@@ -25,19 +25,30 @@ a{color:var(--yellow)}
 
 /* ============ LOGIN ============ */
 #login{min-height:100vh;display:grid;place-items:center;padding:24px;
-  background:radial-gradient(800px 400px at 50% 0%,rgba(245,166,35,.12),transparent 60%),var(--bg)}
-.login-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:38px 32px;text-align:center}
+  background:radial-gradient(800px 400px at 50% 0%,rgba(245,166,35,.14),transparent 60%),var(--bg)}
+.login-box{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:38px 32px;text-align:center;
+  border-top:3px solid var(--amber);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.login-icon{width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.10);border:1.5px solid rgba(245,166,35,.45);
+  display:grid;place-items:center;font-size:30px;margin:0 auto 14px}
 .logo{font-family:'Outfit';font-weight:800;font-size:22px;margin-bottom:6px}
 .logo b{color:var(--yellow)}
-.login-box .sub{color:var(--g500);font-size:14px;margin-bottom:26px}
+.login-box .sub{color:var(--g500);font-size:14px;margin-bottom:22px}
+.first-access{background:rgba(245,166,35,.06);border:1.5px solid rgba(245,166,35,.35);border-radius:14px;padding:16px 18px;margin-bottom:22px;text-align:left}
+.first-access h4{font-family:'Outfit';font-size:14.5px;color:var(--yellow);margin-bottom:8px}
+.first-access ol{list-style:none;counter-reset:fa;padding:0;margin:0}
+.first-access li{counter-increment:fa;font-size:13px;color:var(--g500);margin-bottom:4px;padding-left:22px;position:relative}
+.first-access li::before{content:counter(fa) ".";position:absolute;left:0;color:var(--yellow);font-weight:700}
+.first-access li b{color:#fff;font-weight:700}
 .field{text-align:left;margin-bottom:14px}
 .field label{display:block;font-size:13px;font-weight:700;color:var(--g600);margin-bottom:6px}
 .field input{width:100%;background:#0F1729;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;color:#fff;font-size:15px;transition:.15s}
 .field input:focus{outline:none;border-color:var(--amber)}
 .btn{background:linear-gradient(180deg,var(--amber-2),var(--amber));color:#161616;font-family:'Outfit';font-weight:800;border-radius:12px;padding:15px 22px;font-size:15px;width:100%;transition:.2s;box-shadow:0 8px 22px rgba(245,166,35,.28)}
-.btn:hover{filter:brightness(1.06)}
+.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
 .btn:disabled{opacity:.6;cursor:wait}
-.linkbtn{background:none;color:var(--g500);font-size:13.5px;text-decoration:underline;margin-top:16px;width:100%;padding:4px}
+.login-links{margin-top:20px;font-size:13.5px;color:var(--g400);line-height:1.9}
+.login-links a{color:var(--yellow);cursor:pointer;text-decoration:underline;font-weight:600}
+.login-links a:hover{color:var(--amber-2)}
 .msg{font-size:13.5px;border-radius:10px;padding:11px 14px;margin-bottom:16px;display:none;text-align:left}
 .msg.err{display:block;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);color:#FCA5A5}
 .msg.ok{display:block;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:#6EE7B7}
@@ -133,22 +144,36 @@ header .who b{color:#fff;display:block;font-family:'Outfit';font-size:14px}
 <!-- ==================== LOGIN ==================== -->
 <div id="login">
   <div class="login-box">
+    <div class="login-icon">🚗</div>
     <div class="logo">Método <b>CNH</b></div>
-    <p class="sub">Entre com o e-mail e a senha que você recebeu após a compra.</p>
+    <p class="sub" id="loginSub">Entre para acessar suas aulas</p>
+
+    <div class="first-access" id="firstAccess">
+      <h4>É seu primeiro acesso?</h4>
+      <ol>
+        <li>Clique em <b>"Criar conta"</b> abaixo</li>
+        <li>Cadastre seu melhor email e crie uma senha</li>
+        <li>Pronto — é só estudar!</li>
+      </ol>
+    </div>
 
     <div class="msg" id="msg"></div>
 
     <div class="field">
-      <label for="email">E-mail</label>
-      <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+      <label for="email">Seu email</label>
+      <input type="email" id="email" placeholder="Seu email cadastrado" autocomplete="email">
     </div>
     <div class="field">
-      <label for="pass">Senha</label>
-      <input type="password" id="pass" placeholder="••••••••" autocomplete="current-password">
+      <label for="pass" id="passLabel">Senha</label>
+      <input type="password" id="pass" placeholder="Sua senha" autocomplete="current-password">
     </div>
 
-    <button class="btn" id="btnLogin">ENTRAR NA ÁREA DE ESTUDOS</button>
-    <button class="linkbtn" id="btnReset">Esqueci minha senha</button>
+    <button class="btn" id="btnLogin">Entrar</button>
+
+    <div class="login-links">
+      <div id="toggleLine">Novo por aqui? <a id="btnToggle">Criar conta</a></div>
+      <div>Esqueceu a senha? <a id="btnReset">Redefinir minha senha</a></div>
+    </div>
 
     <p class="login-foot">Comprou e não recebeu o acesso? Fale com o suporte.</p>
   </div>
@@ -487,19 +512,54 @@ const todasAulas = MODULOS.flatMap(m => m.aulas);
 /* ===================== login ===================== */
 const $ = id => document.getElementById(id);
 const msg = (txt, tipo='err') => { const m=$('msg'); m.textContent=txt; m.className='msg '+tipo; };
+const clearMsg = () => { $('msg').className='msg'; $('msg').textContent=''; };
+
+let isSignUp = false;
+
+function setMode(signup){
+  isSignUp = signup;
+  clearMsg();
+  if(signup){
+    $('btnLogin').textContent = 'Criar conta';
+    $('loginSub').textContent = 'Crie sua conta para começar a estudar';
+    $('toggleLine').innerHTML = 'Já tem conta? <a id="btnToggle">Entrar</a>';
+    $('firstAccess').style.display = 'none';
+  } else {
+    $('btnLogin').textContent = 'Entrar';
+    $('loginSub').textContent = 'Entre para acessar suas aulas';
+    $('toggleLine').innerHTML = 'Novo por aqui? <a id="btnToggle">Criar conta</a>';
+    $('firstAccess').style.display = 'block';
+  }
+  $('btnToggle').onclick = () => setMode(!isSignUp);
+}
+$('btnToggle').onclick = () => setMode(true);
 
 $('btnLogin').onclick = async () => {
   const email = $('email').value.trim(), password = $('pass').value;
   if(!email || !password) return msg('Preencha o e-mail e a senha.');
-  $('btnLogin').disabled = true; $('btnLogin').textContent = 'ENTRANDO...';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  $('btnLogin').disabled = false; $('btnLogin').textContent = 'ENTRAR NA ÁREA DE ESTUDOS';
-  if(error) return msg('E-mail ou senha incorretos. Confira os dados que você recebeu por e-mail.');
-  iniciar();
+  if(isSignUp && password.length < 6) return msg('A senha precisa ter pelo menos 6 caracteres.');
+  $('btnLogin').disabled = true;
+  $('btnLogin').textContent = isSignUp ? 'CRIANDO CONTA...' : 'ENTRANDO...';
+
+  if(isSignUp){
+    const { error } = await sb.auth.signUp({ email, password });
+    $('btnLogin').disabled = false;
+    $('btnLogin').textContent = 'Criar conta';
+    if(error) return msg(error.message.includes('already') ? 'Esse e-mail já está cadastrado. Clique em "Entrar".' : 'Erro ao criar conta. Tente novamente.');
+    msg('Conta criada! Verifique seu e-mail para confirmar o cadastro. ✅', 'ok');
+    setMode(false);
+  } else {
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    $('btnLogin').disabled = false;
+    $('btnLogin').textContent = 'Entrar';
+    if(error) return msg('E-mail ou senha incorretos. Confira os dados que você recebeu por e-mail.');
+    iniciar();
+  }
 };
 $('pass').addEventListener('keydown', e => { if(e.key==='Enter') $('btnLogin').click(); });
 
-$('btnReset').onclick = async () => {
+$('btnReset').onclick = async (e) => {
+  e.preventDefault();
   const email = $('email').value.trim();
   if(!email) return msg('Digite seu e-mail acima e clique de novo.');
   const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
