@@ -494,13 +494,14 @@ const MODULOS = [
 /* =====================================================================
    3) MATERIAIS PARA DOWNLOAD — troque o "url" pelo link do seu PDF
    ===================================================================== */
+const BUCKET_URL = 'https://mfsmobustnbdjffsvxne.supabase.co/storage/v1/object/public/materiais';
 const MATERIAIS = [
-  { ico:'⚠️', t:'25 Pegadinhas que Mais Reprovam', d:'As questões-armadilha, com gabarito comentado.', url:'#' },
-  { ico:'⚖️', t:'25 Questões de Legislação',        d:'As que mais aparecem na prova do Detran.',      url:'#' },
-  { ico:'🧠', t:'Mapas Mentais das Placas',          d:'Todas as placas em mapas visuais.',            url:'#' },
-  { ico:'✅', t:'Checklist Premium DETRAN 2026',     d:'Revisão + véspera + dia da prova.',            url:'#' },
-  { ico:'📝', t:'Simulados Completos',               d:'Provas no estilo do Detran, com gabarito.',    url:'#' },
-  { ico:'📄', t:'30 Perguntas Mais Cobradas',        d:'Resumo rápido pra revisar antes da prova.',    url:'#' },
+  { ico:'⚠️', t:'25 Pegadinhas que Mais Reprovam', d:'As questões-armadilha, com gabarito comentado.', file:'25-pegadinhas-que-mais-reprovam.pdf', saveAs:'25 Pegadinhas que Mais Reprovam.pdf' },
+  { ico:'⚖️', t:'25 Questões de Legislação',        d:'As que mais aparecem na prova do Detran.',      file:'25-questoes-de-legislacao.pdf', saveAs:'25 Questões de Legislação.pdf' },
+  { ico:'🧠', t:'Mapas Mentais das Placas',          d:'Todas as placas em mapas visuais.',            file:'mapas-mentais-das-placas.pdf', saveAs:'Mapas Mentais das Placas.pdf' },
+  { ico:'✅', t:'Checklist Premium DETRAN 2026',     d:'Revisão + véspera + dia da prova.',            file:'checklist-premium-detran-2026.pdf', saveAs:'Checklist Premium DETRAN 2026.pdf' },
+  { ico:'📝', t:'Simulados Completos',               d:'Provas no estilo do Detran, com gabarito.',    file:'simulados-completos.pdf', saveAs:'Simulados Completos.pdf' },
+  { ico:'📄', t:'30 Perguntas Mais Cobradas',        d:'Resumo rápido pra revisar antes da prova.',    file:'30-perguntas-mais-cobradas.pdf', saveAs:'30 Perguntas Mais Cobradas.pdf' },
 ];
 
 /* ===================== estado ===================== */
@@ -677,13 +678,50 @@ function atualizarBarra(){
 }
 
 /* ===================== materiais ===================== */
+async function baixarArquivo(event, url, saveAs) {
+  event.preventDefault();
+  const btn = event.currentTarget;
+  const originalText = btn.textContent;
+  
+  btn.style.opacity = '0.6';
+  btn.textContent = 'Verificando...';
+
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    if (res.status === 404 || res.status === 403) {
+      alert('Arquivo indisponível no momento');
+      btn.style.opacity = '1';
+      btn.textContent = originalText;
+      return;
+    }
+  } catch (err) {
+    console.warn('Erro na checagem previa do arquivo (CORS/rede), iniciando download direta:', err);
+  }
+
+  btn.style.opacity = '1';
+  btn.textContent = originalText;
+
+  const tempLink = document.createElement('a');
+  tempLink.href = url;
+  tempLink.setAttribute('download', saveAs);
+  tempLink.style.display = 'none';
+  document.body.appendChild(tempLink);
+  tempLink.click();
+  document.body.removeChild(tempLink);
+}
+
+window.baixarArquivo = baixarArquivo;
+
 function renderMateriais(){
-  $('dls').innerHTML = MATERIAIS.map(m => `
-    <div class="dl">
-      <span class="ico">${m.ico}</span>
-      <div><h4>${m.t}</h4><p>${m.d}</p></div>
-      <a class="go" href="${m.url}" target="_blank" rel="noopener">Baixar</a>
-    </div>`).join('');
+  $('dls').innerHTML = MATERIAIS.map(m => {
+    const fileUrl = `${BUCKET_URL}/${m.file}`;
+    return `
+      <div class="dl">
+        <span class="ico">${m.ico}</span>
+        <div><h4>${m.t}</h4><p>${m.d}</p></div>
+        <a class="go" href="${fileUrl}" onclick="baixarArquivo(event, '${fileUrl}', '${m.saveAs}')">Baixar</a>
+      </div>`;
+  }).join('');
 }
 
 /* ===================== abas ===================== */
