@@ -231,7 +231,7 @@ header .who b{color:#fff;display:block;font-family:'Outfit';font-size:14px}
     <!-- ---------- DOWNLOADS ---------- -->
     <div class="pane" id="pane-downloads">
       <h2 class="pane-title">Seus materiais 📥</h2>
-      <p class="pane-sub">Baixe, imprima e revise quantas vezes quiser.</p>
+      <p class="pane-sub">Abra, imprima e revise quantas vezes quiser.</p>
       <div class="dls" id="dls"></div>
     </div>
   </div>
@@ -496,12 +496,12 @@ const MODULOS = [
    ===================================================================== */
 const BUCKET_URL = 'https://mfsmobustnbdjffsvxne.supabase.co/storage/v1/object/public/materiais';
 const MATERIAIS = [
-  { ico:'⚠️', t:'25 Pegadinhas que Mais Reprovam', d:'As questões-armadilha, com gabarito comentado.', file:'25-pegadinhas-que-mais-reprovam.pdf', saveAs:'25 Pegadinhas que Mais Reprovam.pdf' },
-  { ico:'⚖️', t:'25 Questões de Legislação',        d:'As que mais aparecem na prova do Detran.',      file:'25-questoes-de-legislacao.pdf', saveAs:'25 Questões de Legislação.pdf' },
-  { ico:'🧠', t:'Mapas Mentais das Placas',          d:'Todas as placas em mapas visuais.',            file:'mapas-mentais-das-placas.pdf', saveAs:'Mapas Mentais das Placas.pdf' },
-  { ico:'✅', t:'Checklist Premium DETRAN 2026',     d:'Revisão + véspera + dia da prova.',            file:'checklist-premium-detran-2026.pdf', saveAs:'Checklist Premium DETRAN 2026.pdf' },
-  { ico:'📝', t:'Simulados Completos',               d:'Provas no estilo do Detran, com gabarito.',    file:'simulados-completos.pdf', saveAs:'Simulados Completos.pdf' },
-  { ico:'📄', t:'30 Perguntas Mais Cobradas',        d:'Resumo rápido pra revisar antes da prova.',    file:'30-perguntas-mais-cobradas.pdf', saveAs:'30 Perguntas Mais Cobradas.pdf' },
+  { ico:'⚠️', t:'25 Pegadinhas que Mais Reprovam', d:'As questões-armadilha, com gabarito comentado.', file:'25-pegadinhas-que-mais-reprovam.pdf' },
+  { ico:'⚖️', t:'25 Questões de Legislação',        d:'As que mais aparecem na prova do Detran.',      file:'25-questoes-de-legislacao.pdf' },
+  { ico:'🧠', t:'Mapas Mentais das Placas',          d:'Todas as placas em mapas visuais.',            file:'mapas-mentais-das-placas.pdf' },
+  { ico:'✅', t:'Checklist Premium DETRAN 2026',     d:'Revisão + véspera + dia da prova.',            file:'checklist-premium-detran-2026.pdf' },
+  { ico:'📝', t:'Simulados Completos',               d:'Provas no estilo do Detran, com gabarito.',    file:'simulados-completos.pdf' },
+  { ico:'📄', t:'30 Perguntas Mais Cobradas',        d:'Resumo rápido pra revisar antes da prova.',    file:'30-perguntas-mais-cobradas.pdf' },
 ];
 
 /* ===================== estado ===================== */
@@ -678,40 +678,6 @@ function atualizarBarra(){
 }
 
 /* ===================== materiais ===================== */
-async function baixarArquivo(event, url, saveAs) {
-  event.preventDefault();
-  const btn = event.currentTarget;
-  const originalText = btn.textContent;
-  
-  btn.style.opacity = '0.6';
-  btn.textContent = 'Verificando...';
-
-  try {
-    const res = await fetch(url, { method: 'HEAD' });
-    if (res.status === 404 || res.status === 403) {
-      alert('Arquivo indisponível no momento');
-      btn.style.opacity = '1';
-      btn.textContent = originalText;
-      return;
-    }
-  } catch (err) {
-    console.warn('Erro na checagem previa do arquivo (CORS/rede), iniciando download direta:', err);
-  }
-
-  btn.style.opacity = '1';
-  btn.textContent = originalText;
-
-  const tempLink = document.createElement('a');
-  tempLink.href = url;
-  tempLink.setAttribute('download', saveAs);
-  tempLink.style.display = 'none';
-  document.body.appendChild(tempLink);
-  tempLink.click();
-  document.body.removeChild(tempLink);
-}
-
-window.baixarArquivo = baixarArquivo;
-
 function renderMateriais(){
   $('dls').innerHTML = MATERIAIS.map(m => {
     const fileUrl = `${BUCKET_URL}/${m.file}`;
@@ -719,7 +685,7 @@ function renderMateriais(){
       <div class="dl">
         <span class="ico">${m.ico}</span>
         <div><h4>${m.t}</h4><p>${m.d}</p></div>
-        <a class="go" href="${fileUrl}" onclick="baixarArquivo(event, '${fileUrl}', '${m.saveAs}')">Baixar</a>
+        <a class="go" href="${fileUrl}" target="_blank" rel="noopener noreferrer">Abrir</a>
       </div>`;
   }).join('');
 }
